@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # json file used for authentication
-.json
+*.json
