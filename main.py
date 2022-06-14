@@ -4,6 +4,8 @@ from datetime import datetime
 
 import GCP_API
 
+date_today = str(datetime.now())[0:10]
+
 
 def backup1(project, zone):
     vms = GCP_API.fetch_vms(project, zone)
@@ -20,15 +22,17 @@ def backup1(project, zone):
     print(tabulate(tableData, headers=[
           "Instance", "Backup Enabled", "Disk", "Last Backup"]))
 
-def backup_done_today(project,vm):
+
+def backup_done_today(project, vm):
     # Check if first 9 characters are the same
-    dt = str(datetime.now())[0:10]
+    dt = date_today
     snapshots = GCP_API.fetch_snapshots(project)
-    has_backup_been_done_today=False
+    has_backup_been_done_today = False
     for item in snapshots.items:
-        if(item.creation_timestamp[0:10]==dt):
-            has_backup_been_done_today=True
+        if(item.creation_timestamp[0:10] == dt):
+            has_backup_been_done_today = True
     return has_backup_been_done_today
+
 
 def backup2(project, zone):
     vms = GCP_API.fetch_vms(project, zone)
@@ -38,7 +42,8 @@ def backup2(project, zone):
             if(backup_done_today(project, vm)):
                 print("Backup has already been done today.")
             else:
-                GCP_API.create_snapshot(project, zone, vm.disks[0])
+                GCP_API.create_snapshot(
+                    project, zone, vm.disks[0], f'{vm.name}-{date_today}')
         else:
             print(f'{vm.name} has no "backup" label')
 
