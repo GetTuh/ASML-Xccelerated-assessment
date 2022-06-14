@@ -1,10 +1,16 @@
 import sys
 from tabulate import tabulate
 from datetime import datetime
+import time
 
 import GCP_API
 
 date_today = str(datetime.now())[0:10]
+
+
+def stringToTimestamp(string):
+    string = string.replace("T", " ")[:-6]
+    return(datetime.strptime(string, '%Y-%m-%d %H:%M:%S.%f'))
 
 
 def backup1(project, zone):
@@ -29,12 +35,14 @@ def backup_done_today(project, vm):
     snapshots = GCP_API.fetch_snapshots(project)
     has_backup_been_done_today = False
     for item in snapshots.items:
+        # TODO: change date checking logic to timestamps instead of string
         if(item.creation_timestamp[0:10] == dt):
             has_backup_been_done_today = True
     return has_backup_been_done_today
 
 
 def backup2(project, zone):
+    #TODO: zonalOperations (ZoneOperationsClient)
     vms = GCP_API.fetch_vms(project, zone)
     for vm in vms.items:
         if(vm.labels['backup'] == 'true'):
@@ -49,6 +57,10 @@ def backup2(project, zone):
 
 
 def backup3(project, zone):
+    vms = GCP_API.fetch_vms(project, zone)
+    for vm in vms.items:
+        print(vm.creation_timestamp)
+    # GCP_API.delete_snapshot(project, snapshot_name)
     return 0
 
 
@@ -59,8 +71,7 @@ def main(mode, zone=0):
     if(mode == 'backup-2'):
         backup2(project, zone)
     if(mode == 'backup-3'):
-        snapshot = "initial-snapshot"
-        backup3(project, snapshot)
+        backup3(project, zone)
 
 
 if(len(str(sys.argv)) == 3):
