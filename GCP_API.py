@@ -1,6 +1,8 @@
 from google.cloud import compute_v1
 
+
 def fetch_vms(project, zone):
+    print("Fetching vms...")
     c = compute_v1.InstancesClient.from_service_account_json(
         "xcc-assessment-jakub.json")
     instances = c.list(project=project, zone=zone)
@@ -8,6 +10,7 @@ def fetch_vms(project, zone):
 
 
 def fetch_snapshots(project):
+    print("Fetching snapshots...")
     c = compute_v1.SnapshotsClient.from_service_account_json(
         "xcc-assessment-jakub.json")
     snapshots = c.list(project=project)
@@ -15,6 +18,7 @@ def fetch_snapshots(project):
 
 
 def create_snapshot(project, zone, disk):
+    print("Creating snapshot...")
     c = compute_v1.SnapshotsClient.from_service_account_json(
         "xcc-assessment-jakub.json")
     snap = {
