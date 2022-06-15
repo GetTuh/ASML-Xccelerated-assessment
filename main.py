@@ -5,8 +5,6 @@ import time
 
 import GCP_API
 
-date_today = str(datetime.now())[0:10]
-
 
 def stringToTimestamp(string):
     string = string.replace("T", " ")[:-6]
@@ -30,13 +28,10 @@ def backup1(project, zone):
 
 
 def backup_done_today(project, vm):
-    # Check if first 9 characters are the same
-    dt = date_today
     snapshots = GCP_API.fetch_snapshots(project)
     has_backup_been_done_today = False
     for item in snapshots.items:
-        # TODO: change date checking logic to timestamps instead of string
-        if(item.creation_timestamp[0:10] == dt):
+        if(stringToTimestamp(item.creation_timestamp).date() == datetime.now().date()):
             has_backup_been_done_today = True
     return has_backup_been_done_today
 
@@ -48,10 +43,10 @@ def backup2(project, zone):
         if(vm.labels['backup'] == 'true'):
             print(f'{vm.name} has "backup" label')
             if(backup_done_today(project, vm)):
-                print("Backup has already been done today.")
+                print(f'Backup has already been done today for {vm.name}.')
             else:
                 GCP_API.create_snapshot(
-                    project, zone, vm.disks[0], f'{vm.name}-{date_today}')
+                    project, zone, vm.disks[0], f'{vm.name}-{datetime.now().date()}')
         else:
             print(f'{vm.name} has no "backup" label')
 
