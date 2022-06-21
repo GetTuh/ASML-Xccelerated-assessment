@@ -17,13 +17,13 @@ def fetch_snapshots(project):
     return snapshots
 
 
-def create_snapshot(project, zone, disk,name):
+def create_snapshot(project, zone, disk, name):
     print(f'Creating snapshot with name {name}')
     c = compute_v1.SnapshotsClient.from_service_account_json(
         "xcc-assessment-jakub.json")
     snap = {
         'name': name,
-        'source_disk': disk.source
+        'source_disk': disk.source  # TODO: change to source_disk_id
     }
     c.insert(project=project, snapshot_resource=snap)
 

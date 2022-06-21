@@ -51,12 +51,33 @@ def backup2(project, zone):
             print(f'{vm.name} has no "backup" label')
 
 
+def findDuplicatesWithinDay(all_dates):
+    duplicate_snapshots_to_delete = []
+    for index in range(len(all_dates)):
+        current = all_dates.pop(0)
+        for data in all_dates:
+            if current[2] == data[2]:
+                if(current[1] < data[1]):
+                    duplicate_snapshots_to_delete.append(data)
+                else:
+                    duplicate_snapshots_to_delete.append(current)
+    return duplicate_snapshots_to_delete
+
+
 def backup3(project, zone):
-    vms = GCP_API.fetch_vms(project, zone)
-    for vm in vms.items:
-        print(vm.creation_timestamp)
-    # GCP_API.delete_snapshot(project, snapshot_name)
-    return 0
+    snapshots = GCP_API.fetch_snapshots(project)
+    all_dates = []
+    for snapshot in snapshots.items:  # convert snapshot date to datestamp
+        snapshot_date = stringToTimestamp(snapshot.creation_timestamp)
+        timedelta = (datetime.now().date()-snapshot_date.date()).days
+        if(timedelta < 7):
+            all_dates.append(
+                [snapshot.name, snapshot_date, snapshot_date.date()])
+
+    duplicate_snapshots_to_delete = findDuplicatesWithinDay(all_dates)
+    for snapshot in duplicate_snapshots_to_delete:
+        print(f'Deleting {snapshot[0]}')
+        GCP_API.delete_snapshot(project, snapshot[0])
 
 
 def main(mode, zone=0):
