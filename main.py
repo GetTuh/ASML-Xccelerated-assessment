@@ -46,7 +46,7 @@ def backup3(project, zone):
         all_dates.append(
             [snapshot.name, snapshot_date, snapshot_date.date()])
 
-    duplicate_snapshots_to_delete = helper.find_duplicates_within_day(
+    duplicate_snapshots_to_delete = helper.find_duplicates(
         all_dates)
     for snapshot in duplicate_snapshots_to_delete:
         print(f'Deleting {snapshot[0]}')

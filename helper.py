@@ -16,7 +16,7 @@ def backup_done_today(project, vm):
     return has_backup_been_done_today
 
 
-def find_duplicates_within_day(all_dates):
+def find_duplicates(all_dates):
     duplicate_snapshots_to_delete = []
     for index in range(len(all_dates)):
         current = all_dates.pop(0)
